@@ -1,38 +1,46 @@
+// src/app/(dashboard)/chat/page.tsx
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { Bot, Send, Sparkles, User, Loader2, Lightbulb } from "lucide-react";
+import {
+  Bot,
+  Send,
+  User,
+  Sparkles,
+  Loader2,
+  Lightbulb,
+  AlertCircle,
+  Trash2,
+} from "lucide-react";
 
-type Message = {
+interface Message {
   id: number;
   role: "user" | "assistant";
   content: string;
   timestamp: Date;
-};
+}
 
 const suggestedQuestions = [
-  "¿Cuánto gasté este mes?",
-  "¿Cómo viene mi racha de hábitos?",
-  "Dame un resumen de mi semana",
-  "¿En qué puedo ahorrar?",
-  "¿Cuál es mi hábito más consistente?",
-  "Analiza mis patrones de gasto",
-];
-
-const initialMessages: Message[] = [
-  {
-    id: 1,
-    role: "assistant",
-    content:
-      "¡Hola! 👋 Soy tu asistente personal de LifeSync. Puedo ayudarte a entender tus finanzas, hábitos, y darte insights personalizados. ¿En qué puedo ayudarte hoy?",
-    timestamp: new Date(),
-  },
+  "¿Cómo puedo mejorar mis hábitos de ahorro?",
+  "Necesito estrategias para manejar el estrés",
+  "¿Cómo puedo ser más productivo?",
+  "Quiero establecer una rutina de ejercicio",
+  "Ayudame a organizar mi presupuesto mensual",
 ];
 
 export default function ChatPage() {
-  const [messages, setMessages] = useState<Message[]>(initialMessages);
+  const [messages, setMessages] = useState<Message[]>([
+    {
+      id: 1,
+      role: "assistant",
+      content:
+        "Hola, soy tu asistente de LifeSync-AI. Estoy preparado para ayudarte en finanzas personales, bienestar emocional, gestión de hábitos, salud y seguimiento de ciclo.\n\n¿En qué puedo asistirte hoy?",
+      timestamp: new Date(),
+    },
+  ]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -50,41 +58,68 @@ export default function ChatPage() {
     const userMessage: Message = {
       id: messages.length + 1,
       role: "user",
-      content: input,
+      content: input.trim(),
       timestamp: new Date(),
     };
 
     setMessages((prev) => [...prev, userMessage]);
     setInput("");
     setIsLoading(true);
+    setError(null);
 
-    // Simular respuesta de IA (aquí conectarías con OpenAI/Claude)
-    setTimeout(() => {
-      const responses: Record<string, string> = {
-        "¿Cuánto gasté este mes?":
-          "📊 Este mes llevas gastados **$85,420**.\n\nDesglose por categoría:\n- 🍽️ Alimentación: $32,150 (38%)\n- 🚗 Transporte: $18,200 (21%)\n- ⚡ Servicios: $15,800 (18%)\n- 🎬 Entretenimiento: $12,490 (15%)\n- 🏥 Salud: $6,780 (8%)\n\nEstás un 12% por debajo del mes pasado. ¡Excelente control! 🎉",
-        "¿Cómo viene mi racha de hábitos?":
-          "🎯 Tu progreso de hábitos está muy bien:\n\n- 🏃 Ejercicio: **12 días** de racha ¡Increíble!\n- 💧 Tomar agua: **8 días** seguidos\n- 📚 Leer: **5 días** de racha\n- 😴 Dormir 8h: **4 días**\n\nTu hábito más consistente es **Ejercicio** con 85% de cumplimiento este mes. Seguí así! 💪",
-        "Dame un resumen de mi semana":
-          "📅 **Resumen de tu semana:**\n\n**Finanzas:**\n- Gastaste $23,450 (15% menos que la semana pasada)\n- Mayor gasto: Supermercado ($8,500)\n\n**Hábitos:**\n- Completaste el 78% de tus hábitos\n- Mejor día: Miércoles (6/7 hábitos)\n\n**Diario:**\n- Escribiste 5 entradas\n- Sentimiento promedio: Positivo 😊\n\n**Insight:** Tus mejores días son a mitad de semana. Los fines de semana tendés a gastar más en entretenimiento.",
-        default:
-          "Entendido! Déjame analizar eso por vos... 🤔\n\nBasándome en tus datos, puedo ver algunos patrones interesantes. ¿Querés que profundice en algún área específica como finanzas, hábitos o productividad?",
-      };
+    try {
+      const apiMessages = [...messages.slice(1), userMessage].map((msg) => ({
+        role: msg.role,
+        content: msg.content,
+      }));
+
+      const response = await fetch("/api/chat", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          messages: apiMessages,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Error al obtener respuesta");
+      }
 
       const aiResponse: Message = {
         id: messages.length + 2,
         role: "assistant",
-        content: responses[input] || responses.default,
+        content: data.message,
         timestamp: new Date(),
       };
 
       setMessages((prev) => [...prev, aiResponse]);
+    } catch (err: any) {
+      setError(err.message || "Ocurrió un error. Intentá de nuevo.");
+      console.error("Error en chat:", err);
+    } finally {
       setIsLoading(false);
-    }, 1500);
+    }
   };
 
   const handleSuggestionClick = (question: string) => {
     setInput(question);
+  };
+
+  const clearChat = () => {
+    setMessages([
+      {
+        id: 1,
+        role: "assistant",
+        content:
+          "Hola, soy tu asistente de LifeSync-AI. Estoy preparado para ayudarte en finanzas personales, bienestar emocional, gestión de hábitos, salud y seguimiento de ciclo.\n\n¿En qué puedo asistirte hoy?",
+        timestamp: new Date(),
+      },
+    ]);
+    setError(null);
   };
 
   return (
@@ -96,17 +131,26 @@ export default function ChatPage() {
         </div>
         <div>
           <h1 className="text-xl font-bold text-gray-900 dark:text-white">
-            Chat con IA
+            Asistente LifeSync
           </h1>
           <p className="text-sm text-gray-500 dark:text-gray-400">
-            Tu asistente personal inteligente
+            Tu compañero de bienestar integral
           </p>
         </div>
-        <div className="ml-auto flex items-center gap-2 px-3 py-1 bg-green-100 dark:bg-green-900/30 rounded-full">
-          <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-          <span className="text-sm text-green-700 dark:text-green-400">
-            En línea
-          </span>
+        <div className="ml-auto flex items-center gap-3">
+          <button
+            onClick={clearChat}
+            className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
+            title="Limpiar conversación"
+          >
+            <Trash2 className="w-5 h-5" />
+          </button>
+          <div className="flex items-center gap-2 px-3 py-1 bg-green-100 dark:bg-green-900/30 rounded-full">
+            <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+            <span className="text-sm text-green-700 dark:text-green-400">
+              Disponible
+            </span>
+          </div>
         </div>
       </div>
 
@@ -165,9 +209,20 @@ export default function ChatPage() {
               <div className="flex items-center gap-2">
                 <Loader2 className="w-4 h-4 animate-spin text-brand-500" />
                 <span className="text-gray-500 dark:text-gray-400">
-                  Pensando...
+                  Procesando...
                 </span>
               </div>
+            </div>
+          </div>
+        )}
+
+        {error && (
+          <div className="flex gap-4">
+            <div className="w-10 h-10 rounded-xl bg-red-500 flex items-center justify-center">
+              <AlertCircle className="w-5 h-5 text-white" />
+            </div>
+            <div className="bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400 rounded-2xl rounded-tl-sm px-4 py-3">
+              <p>{error}</p>
             </div>
           </div>
         )}
@@ -180,7 +235,7 @@ export default function ChatPage() {
         <div className="py-4 border-t border-gray-200 dark:border-gray-800">
           <div className="flex items-center gap-2 mb-3 text-sm text-gray-500 dark:text-gray-400">
             <Lightbulb className="w-4 h-4" />
-            <span>Sugerencias</span>
+            <span>Consultas frecuentes</span>
           </div>
           <div className="flex flex-wrap gap-2">
             {suggestedQuestions.map((question, index) => (
@@ -206,21 +261,18 @@ export default function ChatPage() {
             type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder="Preguntame lo que quieras..."
-            className="flex-1 px-4 py-3 bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500 outline-none"
+            placeholder="Escribí tu consulta..."
             disabled={isLoading}
+            className="flex-1 px-4 py-3 bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent text-gray-900 dark:text-white placeholder-gray-500 disabled:opacity-50"
           />
           <button
             type="submit"
             disabled={!input.trim() || isLoading}
-            className="px-4 py-3 bg-gradient-to-r from-brand-500 to-purple-600 hover:from-brand-600 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-xl transition-all"
+            className="px-4 py-3 bg-brand-500 hover:bg-brand-600 disabled:bg-gray-300 dark:disabled:bg-gray-700 text-white rounded-xl transition-colors disabled:cursor-not-allowed"
           >
             <Send className="w-5 h-5" />
           </button>
         </div>
-        <p className="text-xs text-gray-400 text-center mt-2">
-          LifeSync AI analiza tus datos para darte respuestas personalizadas
-        </p>
       </form>
     </div>
   );

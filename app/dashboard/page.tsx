@@ -28,7 +28,7 @@ const stats = {
   },
   salud: {
     nextPeriod: 8,
-    mood: "😊",
+    mood: "😊"
   },
   diario: {
     entries: 15,

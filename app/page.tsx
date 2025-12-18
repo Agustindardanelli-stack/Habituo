@@ -16,28 +16,28 @@ export default function HomePage() {
     {
       icon: Wallet,
       title: "Finanzas",
-      description: "Controla tus gastos con categorización automática por IA",
+      description: "Entendé mejor en qué se va tu plata y tomá decisiones más tranquilas",
       color: "bg-finanzas",
       gradient: "from-emerald-500 to-teal-600",
     },
     {
       icon: Target,
       title: "Hábitos",
-      description: "Construye rutinas positivas y trackea tu progreso",
+      description: "Pequeños pasos todos los días para construir la vida que querés",
       color: "bg-habitos",
       gradient: "from-violet-500 to-purple-600",
     },
     {
       icon: Heart,
       title: "Salud",
-      description: "Calendario menstrual y seguimiento de bienestar",
+      description: "Tu bienestar primero: recordatorios, seguimiento y autocuidado",
       color: "bg-salud",
       gradient: "from-pink-500 to-rose-600",
     },
     {
       icon: BookOpen,
       title: "Diario",
-      description: "Reflexiona con análisis de sentimiento por IA",
+      description: "Escribí lo que sentís y mirá cómo vas creciendo con el tiempo",
       color: "bg-diario",
       gradient: "from-amber-500 to-orange-600",
     },
@@ -46,23 +46,24 @@ export default function HomePage() {
   const benefits = [
     {
       icon: Bot,
-      title: "IA Personalizada",
-      description: "Un asistente que aprende de tus patrones y te da insights únicos",
+      title: "Un acompañamiento real",
+      description: "No es solo tecnología: es una mano amiga para ordenar tus días",
     },
     {
       icon: Shield,
-      title: "Privacidad Total",
-      description: "Tus datos son tuyos. Encriptación de extremo a extremo",
+      title: "Tu espacio, tus reglas",
+      description: "Todo lo que escribas queda entre vos y tu app. Seguro y privado.",
     },
     {
       icon: Zap,
-      title: "Todo en Uno",
-      description: "Sin saltar entre apps. Todo tu bienestar en un lugar",
+      title: "Menos apps, menos caos",
+      description: "Todo lo importante en un lugar para vivir más liviano",
     },
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white dark:from-gray-950 dark:to-gray-900">
+    <div className="min-h-screen bg-gradient-to-br from-[#fef9ff] via-[#f3f0ff] to-[#e9faff] dark:from-gray-950 dark:via-gray-900 dark:to-gray-800 relative overflow-hidden">
+      
       {/* Header */}
       <header className="fixed top-0 w-full z-50 glass border-b border-gray-200/50 dark:border-gray-800/50">
         <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
@@ -92,25 +93,25 @@ export default function HomePage() {
         </nav>
       </header>
 
-      {/* Hero Section */}
+      {/* Hero */}
       <section className="pt-32 pb-20 px-4">
         <div className="max-w-7xl mx-auto text-center">
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-brand-50 dark:bg-brand-950 rounded-full text-brand-700 dark:text-brand-300 text-sm font-medium mb-8">
             <Sparkles className="w-4 h-4" />
-            Potenciado por Inteligencia Artificial
+            Porque organizar tu vida debería sentirse más simple
           </div>
 
           <h1 className="text-5xl md:text-7xl font-bold text-gray-900 dark:text-white mb-6 leading-tight">
-            Tu vida, organizada
+            Hacé espacio
             <br />
             <span className="bg-gradient-to-r from-brand-500 via-purple-500 to-pink-500 bg-clip-text text-transparent">
-              con inteligencia
+              para lo que te importa
             </span>
           </h1>
 
           <p className="text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto mb-10">
-            Finanzas, hábitos, salud y más. Un asistente personal con IA que
-            aprende de vos y te ayuda a alcanzar tus metas.
+            Menos caos, más claridad. Una app que te acompaña a ordenar tu plata,
+            tus hábitos y tu bienestar… sin estrés, sin complicaciones.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -131,15 +132,15 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Features Grid */}
+      {/* Features */}
       <section className="py-20 px-4 bg-gray-50/50 dark:bg-gray-900/50">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4">
-              Todo lo que necesitás
+              Todo en un mismo lugar
             </h2>
             <p className="text-gray-600 dark:text-gray-400 text-lg">
-              Módulos diseñados para simplificar tu día a día
+              Pensado para tu día a día, sin vueltas
             </p>
           </div>
 
@@ -166,28 +167,28 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* AI Chat Preview */}
+      {/* Chat Preview */}
       <section className="py-20 px-4">
         <div className="max-w-7xl mx-auto">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div>
               <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-6">
-                Chateá con tu
+                Un espacio para hablar
                 <br />
                 <span className="bg-gradient-to-r from-brand-500 to-purple-500 bg-clip-text text-transparent">
-                  asistente personal
+                  de vos y tu vida diaria
                 </span>
               </h2>
               <p className="text-lg text-gray-600 dark:text-gray-400 mb-8">
-                Preguntale cualquier cosa sobre tus datos. La IA analiza tus
-                patrones y te da respuestas personalizadas.
+                Preguntá, revisá y descubrí patrones sin tener que pensar demasiado.
+                Todo para que te sientas más en control, sin sobrecargarte.
               </p>
 
               <div className="space-y-4">
                 {[
-                  "¿Cuánto gasté este mes en comida?",
-                  "¿Cómo viene mi racha de ejercicio?",
-                  "Dame un resumen de mi semana",
+                  "¿Cuánto gasté esta semana?",
+                  "¿Cómo vengo con el ejercicio?",
+                  "¿Qué cosas hice bien estos días?",
                 ].map((question, i) => (
                   <div
                     key={i}
@@ -210,16 +211,16 @@ export default function HomePage() {
               <div className="space-y-4">
                 <div className="flex justify-end">
                   <div className="bg-brand-600 text-white px-4 py-2 rounded-2xl rounded-tr-sm max-w-xs">
-                    ¿Cómo van mis finanzas este mes?
+                    ¿Cómo van mis gastos últimamente?
                   </div>
                 </div>
 
                 <div className="flex justify-start">
                   <div className="bg-gray-800 text-gray-100 px-4 py-3 rounded-2xl rounded-tl-sm max-w-sm">
-                    <p className="mb-2">📊 Este mes llevas gastados <strong>$85,420</strong></p>
+                    <p className="mb-2">🧾 Este mes llevás <strong>$85,420</strong> en total</p>
                     <p className="text-sm text-gray-400">
-                      Estás un 12% por debajo del mes pasado. ¡Excelente! Tu
-                      mayor gasto fue en Alimentación ($32,150).
+                      Venís mejor que el mes pasado. La mayor parte se fue en comida,
+                      pero estás dentro de tu presupuesto. Buen ritmo.
                     </p>
                   </div>
                 </div>
@@ -254,10 +255,10 @@ export default function HomePage() {
       <section className="py-20 px-4">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-6">
-            ¿Listo para organizarte?
+            ¿Te gustaría vivir más liviano?
           </h2>
           <p className="text-lg text-gray-600 dark:text-gray-400 mb-8">
-            Empezá gratis. Sin tarjeta de crédito.
+            Probala sin compromiso. Empezá hoy.
           </p>
           <Link
             href="/auth/register"
@@ -279,7 +280,7 @@ export default function HomePage() {
             </span>
           </div>
           <p className="text-gray-500 text-sm">
-            © 2024 LifeSync AI. Hecho con ❤️ en Argentina.
+            © 2024 LifeSync AI. Creado con dedicación desde Argentina.
           </p>
         </div>
       </footer>
