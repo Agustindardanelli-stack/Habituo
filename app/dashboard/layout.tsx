@@ -60,13 +60,7 @@ const navigation = [
     color: "text-diario",
     bgColor: "bg-diario/10",
   },
-  {
-    name: "Chat IA",
-    href: "/dashboard/chat",
-    icon: Bot,
-    color: "text-purple-500",
-    bgColor: "bg-purple-500/10",
-  },
+  
 ];
 
 export default function DashboardLayout({
@@ -147,7 +141,7 @@ export default function DashboardLayout({
           {/* Bottom navigation */}
           <div className="px-4 py-4 border-t border-gray-200 dark:border-gray-800">
             <Link
-              href="/dashboard/settings"
+              href="/dashboard/configuracion"
               className="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
             >
               <Settings className="w-5 h-5" />
@@ -201,7 +195,7 @@ export default function DashboardLayout({
 
             <div className="flex-1 lg:flex-none" />
 
-            <div className="flex items-center gap-4">
+            {/* <div className="flex items-center gap-4">
               <button className="relative p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
                 <Bell className="w-5 h-5 text-gray-600 dark:text-gray-400" />
                 <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full" />
@@ -214,7 +208,7 @@ export default function DashboardLayout({
                 <Bot className="w-4 h-4" />
                 Chat IA
               </Link>
-            </div>
+            </div> */}
           </div>
         </header>
 

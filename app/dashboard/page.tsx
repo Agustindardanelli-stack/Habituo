@@ -85,6 +85,7 @@ const quickActions = [
     icon: BookOpen,
     color: "gradient-diario",
   },
+  
 ];
 
 export default function DashboardPage() {
@@ -217,7 +218,7 @@ export default function DashboardPage() {
       </div>
 
       {/* AI Insight */}
-      <div className="bg-gradient-to-r from-brand-500 to-purple-600 rounded-2xl p-6 text-white">
+      {/* <div className="bg-gradient-to-r from-brand-500 to-purple-600 rounded-2xl p-6 text-white">
         <div className="flex items-start gap-4">
           <div className="w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center flex-shrink-0">
             <Sparkles className="w-6 h-6" />
@@ -238,7 +239,7 @@ export default function DashboardPage() {
             </Link>
           </div>
         </div>
-      </div>
+      </div> */}
 
       {/* Recent Activity */}
       <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800">
