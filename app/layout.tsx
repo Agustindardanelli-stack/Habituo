@@ -6,7 +6,7 @@ import { Toaster } from "sonner";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "LifeSync AI - Tu Asistente Personal Inteligente",
+  title: "LifeSync - Tu Asistente Personal Inteligente",
   description:
     "Gestiona tus finanzas, hábitos, salud y más con inteligencia artificial. Todo en un solo lugar.",
   keywords: [
@@ -18,7 +18,7 @@ export const metadata: Metadata = {
   ],
   authors: [{ name: "Agustín" }],
   openGraph: {
-    title: "LifeSync AI",
+    title: "LifeSync ",
     description: "Tu asistente personal inteligente",
     type: "website",
   },

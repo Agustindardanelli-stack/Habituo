@@ -32,7 +32,7 @@ import {
   getDayPrediction,
   type NewCycleLog,
   type DayPrediction,
-} from "@/lib/api/cycle";
+} from "@/app/api/cycle";
 import { toast } from "sonner";
 
 const WEEKDAYS = ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"];

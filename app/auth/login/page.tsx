@@ -58,7 +58,7 @@ export default function LoginPage() {
               <Sparkles className="w-7 h-7 text-white" />
             </div>
             <span className="text-2xl font-bold text-gray-900 dark:text-white">
-              LifeSync AI
+              LifeSync 
             </span>
           </Link>
         </div>
@@ -215,9 +215,10 @@ export default function LoginPage() {
 
         {/* Footer */}
         <p className="text-center text-gray-400 text-sm mt-6">
-          © 2024 LifeSync AI. Hecho con ❤️ en Argentina.
+          © 2024 LifeSync 
         </p>
       </div>
     </div>
+    
   );
 }

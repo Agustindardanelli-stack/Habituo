@@ -14,7 +14,7 @@ import {
   X,
 } from "lucide-react";
 import { useHabits } from "@/hooks/useHabits";
-import { HABIT_ICONS, HABIT_COLORS } from "@/lib/api/habits";
+import { HABIT_ICONS, HABIT_COLORS } from "@/app/api/habits";
 import { toast } from "sonner";
 
 const weekDays = ["L", "M", "X", "J", "V", "S", "D"];

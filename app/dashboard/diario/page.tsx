@@ -39,7 +39,7 @@ import {
   analyzeContent,
   type NewJournalEntry,
   type JournalEntry,
-} from "@/lib/api/journal";
+} from "@/app/api/journal";
 import { toast } from "sonner";
 
 const WEEKDAYS = ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"];

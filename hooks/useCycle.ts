@@ -8,7 +8,7 @@ import {
   type CycleLog,
   type CyclePrediction,
   type NewCycleLog,
-} from "@/lib/api/cycle";
+} from "@/app/api/cycle";
 
 export function useCycle() {
   const [logs, setLogs] = useState<CycleLog[]>([]);

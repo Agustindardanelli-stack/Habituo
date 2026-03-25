@@ -54,7 +54,7 @@ export default function RegisterPage() {
               <Sparkles className="w-7 h-7 text-white" />
             </div>
             <span className="text-2xl font-bold text-gray-900 dark:text-white">
-              LifeSync AI
+              LifeSync 
             </span>
           </Link>
         </div>

@@ -15,7 +15,7 @@ import {
   X,
 } from "lucide-react";
 import { useTransactions } from "@/hooks/useTransactions";
-import { CATEGORIES, type NewTransaction } from "@/lib/api/transactions";
+import { CATEGORIES, type NewTransaction } from "@/app/api/transactions";
 import { toast } from "sonner";
 
 const getCategoryColor = (category: string) => {
