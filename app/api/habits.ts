@@ -60,9 +60,11 @@ export const HABIT_COLORS = [
 function calculateStreak(logs: HabitLog[]): number {
   if (logs.length === 0) return 0;
 
-  const sortedDates = [...new Set(logs.map((l) => l.date))].sort(
-    (a, b) => new Date(b).getTime() - new Date(a).getTime()
-  );
+  const uniqueDates = Array.from(new Set(logs.map((l) => l.date)));
+
+const sortedDates = uniqueDates.sort(
+  (a, b) => new Date(b).getTime() - new Date(a).getTime()
+);
 
   const today = new Date().toISOString().split("T")[0];
   const yesterday = new Date(Date.now() - 86400000).toISOString().split("T")[0];
