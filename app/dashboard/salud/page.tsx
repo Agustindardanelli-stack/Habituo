@@ -506,10 +506,10 @@ export default function SaludPage() {
                     <span className="text-gray-700 dark:text-gray-300">{activity}</span>
                   </div>
                 ))}
-                {phase?.training.avoid.length > 0 && (
+                {(phase?.training.avoid?.length ?? 0) > 0 && (
                   <>
                     <div className="border-t border-gray-200 dark:border-gray-700 my-3" />
-                    {phase.training.avoid.slice(0, 2).map((activity, i) => (
+                    {phase?.training.avoid.slice(0, 2).map((activity, i) => (
                       <div key={i} className="flex items-center gap-2 text-sm">
                         <X className="w-4 h-4 text-red-500 flex-shrink-0" />
                         <span className="text-gray-500 dark:text-gray-400">{activity}</span>
@@ -841,7 +841,7 @@ export default function SaludPage() {
                           ? "ring-2 ring-offset-2 scale-110"
                           : "bg-gray-100 dark:bg-gray-800 hover:scale-105"
                       }`}
-                      style={{ ringColor: formData.mood === mood.value ? mood.color : undefined }}
+                      style={{ "--ring-color": formData.mood === mood.value ? mood.color : undefined } as React.CSSProperties}
                     >
                       {mood.icon}
                     </button>

@@ -189,13 +189,20 @@ export default function ConfiguracionPage() {
   // ── Cerrar sesión ──────────────────────────────────────────────────
   async function handleSignOut() {
     await supabase.auth.signOut();
-    window.location.href = "/login";
+    window.location.href = "/auth/login";
   }
 
   // ── Borrar cuenta ──────────────────────────────────────────────────
   async function handleDeleteAccount() {
     if (deleteConfirm !== "ELIMINAR") return;
-    toast.error("Esta función requiere un endpoint de servidor. Implementala en una API route.");
+    try {
+      const res = await fetch("/api/user/delete", { method: "DELETE" });
+      if (!res.ok) throw new Error();
+      await supabase.auth.signOut();
+      window.location.href = "/auth/login";
+    } catch {
+      toast.error("No se pudo eliminar la cuenta. Intentá más tarde.");
+    }
     setShowDeleteModal(false);
   }
 

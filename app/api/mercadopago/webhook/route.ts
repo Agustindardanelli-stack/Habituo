@@ -3,13 +3,13 @@ import { createClient } from "@supabase/supabase-js";
 import { PreApproval } from "mercadopago";
 import { mp } from "@/lib/mercadopago";
 
-// Cliente admin — bypasea RLS, solo en servidor
-const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
-
 export async function POST(req: NextRequest) {
+  // Cliente admin instanciado dentro del handler para evitar errores en build
+  const supabaseAdmin = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  );
+
   try {
     const body = await req.json();
 
