@@ -21,8 +21,9 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useUser } from "@/hooks/useUser";
+import { useProfile } from "@/hooks/useProfile";
 import { createClient } from "@/lib/supabase";
-import { UpgradeModal } from "../../components/upgrade-modal"; // 🔥 IMPORT
+import { UpgradeModal } from "../../components/upgrade-modal";
 
 const navigation = [
   {
@@ -68,16 +69,26 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [upgradeOpen, setUpgradeOpen] = useState(false); // 🔥 MODAL STATE
+  const [upgradeOpen, setUpgradeOpen] = useState(false);
 
   const pathname = usePathname();
   const router = useRouter();
   const { user, loading } = useUser();
+  const { profile } = useProfile();
 
   const handleLogout = async () => {
-    const supabase = createClient();
-    await supabase.auth.signOut();
-    router.push("/auth/login");
+    try {
+      const supabase = createClient();
+      await supabase.auth.signOut();
+      router.push("/auth/login");
+    } catch (error) {
+      console.error("Error al cerrar sesión:", error);
+    }
+  };
+
+  // 🔥 Mejor active detection (clave SaaS)
+  const isActiveRoute = (href: string) => {
+    return pathname === href || pathname.startsWith(href + "/");
   };
 
   return (
@@ -114,21 +125,24 @@ export default function DashboardLayout({
           {/* Navigation */}
           <nav className="flex-1 px-4 py-6 space-y-1 overflow-y-auto">
             {navigation.map((item) => {
-              const isActive = pathname === item.href;
+              const isActive = isActiveRoute(item.href);
+
               return (
                 <Link
                   key={item.name}
                   href={item.href}
                   className={cn(
-                    "flex items-center gap-3 px-4 py-3 rounded-xl",
+                    "flex items-center gap-3 px-4 py-3 rounded-xl transition-all",
                     isActive
-                      ? `${item.bgColor} ${item.color}`
-                      : "text-gray-600 hover:bg-gray-100"
+                      ? `${item.bgColor} ${item.color} font-medium`
+                      : "text-gray-600 hover:bg-gray-100 dark:hover:bg-gray-800"
                   )}
                 >
                   <item.icon className="w-5 h-5" />
                   {item.name}
-                  {isActive && <ChevronRight className="w-4 h-4 ml-auto" />}
+                  {isActive && (
+                    <ChevronRight className="w-4 h-4 ml-auto" />
+                  )}
                 </Link>
               );
             })}
@@ -136,10 +150,10 @@ export default function DashboardLayout({
 
           {/* Bottom */}
           <div className="px-4 py-4 border-t space-y-2">
-            {/* 🔥 BOTÓN PREMIUM */}
+            {/* 🔥 PREMIUM CTA */}
             <button
               onClick={() => setUpgradeOpen(true)}
-              className="flex items-center gap-3 px-4 py-3 rounded-xl bg-gradient-to-r from-yellow-400 to-orange-500 text-white font-medium w-full"
+              className="flex items-center gap-3 px-4 py-3 rounded-xl bg-gradient-to-r from-yellow-400 to-orange-500 text-white font-medium w-full hover:opacity-90 transition"
             >
               <Crown className="w-5 h-5" />
               Mejorar a Premium
@@ -147,7 +161,7 @@ export default function DashboardLayout({
 
             <Link
               href="/dashboard/configuracion"
-              className="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-100"
+              className="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-100 dark:hover:bg-gray-800"
             >
               <Settings className="w-5 h-5" />
               Configuración
@@ -155,7 +169,7 @@ export default function DashboardLayout({
 
             <button
               onClick={handleLogout}
-              className="flex items-center gap-3 px-4 py-3 rounded-xl text-red-500 hover:bg-red-50 w-full"
+              className="flex items-center gap-3 px-4 py-3 rounded-xl text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 w-full"
             >
               <LogOut className="w-5 h-5" />
               Cerrar sesión
@@ -164,20 +178,27 @@ export default function DashboardLayout({
 
           {/* User */}
           <div className="px-4 py-4 border-t">
-            <div className="flex items-center gap-3 px-4 py-3 rounded-xl bg-gray-100">
+            <div className="flex items-center gap-3 px-4 py-3 rounded-xl bg-gray-100 dark:bg-gray-800">
               <div className="w-10 h-10 rounded-full bg-gradient-to-br from-brand-400 to-brand-600 flex items-center justify-center">
                 <User className="w-5 h-5 text-white" />
               </div>
-              <div className="flex-1">
+
+              <div className="flex-1 min-w-0">
                 {loading ? (
                   <Loader2 className="w-4 h-4 animate-spin" />
-                ) : (
+                ) : user ? (
                   <>
-                    <p className="text-sm font-medium">
-                      {user?.email?.split("@")[0]}
+                    <p className="text-sm font-medium truncate">
+                      {profile?.full_name || user.email?.split("@")[0]}
                     </p>
-                    <p className="text-xs text-gray-500">{user?.email}</p>
+                    <p className="text-xs text-gray-500 truncate">
+                      {user.email}
+                    </p>
                   </>
+                ) : (
+                  <p className="text-sm text-gray-500">
+                    No autenticado
+                  </p>
                 )}
               </div>
             </div>
@@ -196,7 +217,7 @@ export default function DashboardLayout({
         <main className="p-6">{children}</main>
       </div>
 
-      {/* 🔥 MODAL */}
+      {/* Modal */}
       <UpgradeModal
         isOpen={upgradeOpen}
         onClose={() => setUpgradeOpen(false)}

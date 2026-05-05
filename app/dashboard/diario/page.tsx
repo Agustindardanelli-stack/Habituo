@@ -755,8 +755,7 @@ export default function DiarioPage() {
                             ? "ring-2 ring-offset-2 scale-110"
                             : "bg-gray-100 dark:bg-gray-800 hover:scale-105"
                         }`}
-                        style={{ ringColor: formData.mood === mood.value ? mood.color : undefined }}
-                        title={mood.label}
+                        
                       >
                         {mood.icon}
                       </button>

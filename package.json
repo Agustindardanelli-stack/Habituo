@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.18.0",
+    "@google/genai": "^1.48.0",
     "@google/generative-ai": "^0.24.1",
     "@hookform/resolvers": "^3.3.0",
     "@supabase/ssr": "^0.1.0",

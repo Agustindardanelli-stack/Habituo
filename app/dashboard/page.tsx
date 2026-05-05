@@ -6,65 +6,16 @@ import {
   Target,
   Heart,
   BookOpen,
-  TrendingUp,
   TrendingDown,
-  ArrowRight,
   Flame,
   Calendar,
-  Sparkles,
 } from "lucide-react";
-
-// Datos de ejemplo - después vendrán de la base de datos
-const stats = {
-  finanzas: {
-    total: 85420,
-    trend: -12,
-    label: "vs mes anterior",
-  },
-  habitos: {
-    completed: 5,
-    total: 7,
-    streak: 12,
-  },
-  salud: {
-    nextPeriod: 8,
-    mood: "😊"
-  },
-  diario: {
-    entries: 15,
-    streak: 5,
-  },
-};
-
-const recentActivity = [
-  {
-    type: "finanzas",
-    icon: Wallet,
-    title: "Supermercado Carrefour",
-    subtitle: "Alimentación",
-    value: "-$15,420",
-    time: "Hace 2 horas",
-    color: "text-finanzas",
-  },
-  {
-    type: "habitos",
-    icon: Target,
-    title: "Ejercicio completado",
-    subtitle: "30 min running",
-    value: "✓",
-    time: "Hace 4 horas",
-    color: "text-habitos",
-  },
-  {
-    type: "diario",
-    icon: BookOpen,
-    title: "Nueva entrada",
-    subtitle: "Reflexión del día",
-    value: "📝",
-    time: "Ayer",
-    color: "text-diario",
-  },
-];
+import ChatAI from "@/components/ChatAI";
+import { useTransactions } from "@/hooks/useTransactions";
+import { useHabits } from "@/hooks/useHabits";
+import { useCycle } from "@/hooks/useCycle";
+import { useJournal } from "@/hooks/useJournal";
+import { useProfile } from "@/hooks/useProfile";
 
 const quickActions = [
   {
@@ -85,16 +36,83 @@ const quickActions = [
     icon: BookOpen,
     color: "gradient-diario",
   },
-  
 ];
 
+function StatSkeleton() {
+  return (
+    <div className="bg-white dark:bg-gray-900 rounded-2xl p-6 border border-gray-200 dark:border-gray-800 animate-pulse">
+      <div className="flex items-center justify-between mb-4">
+        <div className="w-12 h-12 bg-gray-200 dark:bg-gray-700 rounded-xl" />
+        <div className="w-16 h-4 bg-gray-200 dark:bg-gray-700 rounded" />
+      </div>
+      <div className="w-20 h-4 bg-gray-200 dark:bg-gray-700 rounded mb-2" />
+      <div className="w-32 h-8 bg-gray-200 dark:bg-gray-700 rounded" />
+    </div>
+  );
+}
+
 export default function DashboardPage() {
+  const { stats: finanzasStats, transactions, loading: finanzasLoading } = useTransactions();
+  const { stats: habitStats, habits, loading: habitLoading } = useHabits();
+  const { stats: cycleStats, loading: cycleLoading } = useCycle();
+  const { stats: journalStats, entries, loading: journalLoading } = useJournal();
+  const { profile } = useProfile();
+
+  const isLoading = finanzasLoading || habitLoading || cycleLoading || journalLoading;
+
+  const firstName = profile?.full_name?.split(" ")[0] || null;
+
+  // Actividad reciente dinámica
+  const recentActivity = [
+    ...transactions.slice(0, 2).map((t) => ({
+      type: "finanzas",
+      icon: Wallet,
+      title: t.description,
+      subtitle: t.category_name,
+      value: `-$${Math.abs(t.amount).toLocaleString("es-AR")}`,
+      time: new Date(t.date + "T12:00:00").toLocaleDateString("es-AR", { day: "numeric", month: "short" }),
+      color: "text-finanzas",
+      href: "/dashboard/finanzas",
+    })),
+    ...habits
+      .filter((h) => h.completedToday)
+      .slice(0, 1)
+      .map((h) => ({
+        type: "habitos",
+        icon: Target,
+        title: `${h.icon} ${h.name} completado`,
+        subtitle: `Racha: ${h.streak} días`,
+        value: "✓",
+        time: "Hoy",
+        color: "text-habitos",
+        href: "/dashboard/habitos",
+      })),
+    ...entries.slice(0, 1).map((e) => ({
+      type: "diario",
+      icon: BookOpen,
+      title: e.title || "Nueva entrada",
+      subtitle: e.mood ? `Estado: ${e.mood}` : "Reflexión del día",
+      value: "📝",
+      time: new Date(e.date + "T12:00:00").toLocaleDateString("es-AR", { day: "numeric", month: "short" }),
+      color: "text-diario",
+      href: "/dashboard/diario",
+    })),
+  ].slice(0, 5);
+
+  const moodEmoji = cycleStats?.avgMoodScore
+    ? cycleStats.avgMoodScore >= 4
+      ? "😊"
+      : cycleStats.avgMoodScore >= 3
+      ? "😐"
+      : "😔"
+    : "💗";
+
   return (
     <div className="space-y-8">
       {/* Header */}
       <div>
         <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">
-          ¡Hola! 👋
+          {firstName ? `¡Hola, ${firstName}! 👋` : "¡Hola! 👋"}
         </h1>
         <p className="text-gray-500 dark:text-gray-400 mt-1">
           Acá tenés un resumen de tu día
@@ -116,130 +134,126 @@ export default function DashboardPage() {
       </div>
 
       {/* Stats Grid */}
-      <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {/* Finanzas Card */}
-        <Link
-          href="/dashboard/finanzas"
-          className="bg-white dark:bg-gray-900 rounded-2xl p-6 border border-gray-200 dark:border-gray-800 hover:shadow-lg transition-shadow group"
-        >
-          <div className="flex items-center justify-between mb-4">
-            <div className="w-12 h-12 rounded-xl bg-finanzas/10 flex items-center justify-center">
-              <Wallet className="w-6 h-6 text-finanzas" />
-            </div>
-            <div className="flex items-center gap-1 text-sm">
-              {stats.finanzas.trend < 0 ? (
-                <>
-                  <TrendingDown className="w-4 h-4 text-green-500" />
-                  <span className="text-green-500">{Math.abs(stats.finanzas.trend)}%</span>
-                </>
-              ) : (
-                <>
-                  <TrendingUp className="w-4 h-4 text-red-500" />
-                  <span className="text-red-500">{stats.finanzas.trend}%</span>
-                </>
+      {isLoading ? (
+        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <StatSkeleton />
+          <StatSkeleton />
+          <StatSkeleton />
+          <StatSkeleton />
+        </div>
+      ) : (
+        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {/* Finanzas */}
+          <Link
+            href="/dashboard/finanzas"
+            className="bg-white dark:bg-gray-900 rounded-2xl p-6 border border-gray-200 dark:border-gray-800 hover:shadow-lg transition-shadow group"
+          >
+            <div className="flex items-center justify-between mb-4">
+              <div className="w-12 h-12 rounded-xl bg-finanzas/10 flex items-center justify-center">
+                <Wallet className="w-6 h-6 text-finanzas" />
+              </div>
+              {finanzasStats && finanzasStats.transactionCount > 0 && (
+                <div className="flex items-center gap-1 text-sm text-green-500">
+                  <TrendingDown className="w-4 h-4" />
+                  <span>{finanzasStats.transactionCount} mov.</span>
+                </div>
               )}
             </div>
-          </div>
-          <p className="text-sm text-gray-500 dark:text-gray-400">Este mes</p>
-          <p className="text-2xl font-bold text-gray-900 dark:text-white">
-            ${stats.finanzas.total.toLocaleString()}
-          </p>
-          <p className="text-xs text-gray-400 mt-1">{stats.finanzas.label}</p>
-        </Link>
-
-        {/* Hábitos Card */}
-        <Link
-          href="/dashboard/habitos"
-          className="bg-white dark:bg-gray-900 rounded-2xl p-6 border border-gray-200 dark:border-gray-800 hover:shadow-lg transition-shadow group"
-        >
-          <div className="flex items-center justify-between mb-4">
-            <div className="w-12 h-12 rounded-xl bg-habitos/10 flex items-center justify-center">
-              <Target className="w-6 h-6 text-habitos" />
-            </div>
-            <div className="flex items-center gap-1 text-sm text-orange-500">
-              <Flame className="w-4 h-4" />
-              <span>{stats.habitos.streak} días</span>
-            </div>
-          </div>
-          <p className="text-sm text-gray-500 dark:text-gray-400">Hoy</p>
-          <p className="text-2xl font-bold text-gray-900 dark:text-white">
-            {stats.habitos.completed}/{stats.habitos.total}
-          </p>
-          <div className="mt-2 bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-            <div
-              className="bg-habitos rounded-full h-2 transition-all"
-              style={{
-                width: `${(stats.habitos.completed / stats.habitos.total) * 100}%`,
-              }}
-            />
-          </div>
-        </Link>
-
-        {/* Salud Card */}
-        <Link
-          href="/dashboard/salud"
-          className="bg-white dark:bg-gray-900 rounded-2xl p-6 border border-gray-200 dark:border-gray-800 hover:shadow-lg transition-shadow group"
-        >
-          <div className="flex items-center justify-between mb-4">
-            <div className="w-12 h-12 rounded-xl bg-salud/10 flex items-center justify-center">
-              <Heart className="w-6 h-6 text-salud" />
-            </div>
-            <span className="text-2xl">{stats.salud.mood}</span>
-          </div>
-          <p className="text-sm text-gray-500 dark:text-gray-400">
-            Próximo período
-          </p>
-          <p className="text-2xl font-bold text-gray-900 dark:text-white">
-            {stats.salud.nextPeriod} días
-          </p>
-          <p className="text-xs text-gray-400 mt-1">Fase: Folicular</p>
-        </Link>
-
-        {/* Diario Card */}
-        <Link
-          href="/dashboard/diario"
-          className="bg-white dark:bg-gray-900 rounded-2xl p-6 border border-gray-200 dark:border-gray-800 hover:shadow-lg transition-shadow group"
-        >
-          <div className="flex items-center justify-between mb-4">
-            <div className="w-12 h-12 rounded-xl bg-diario/10 flex items-center justify-center">
-              <BookOpen className="w-6 h-6 text-diario" />
-            </div>
-            <div className="flex items-center gap-1 text-sm text-diario">
-              <Calendar className="w-4 h-4" />
-              <span>{stats.diario.streak} días</span>
-            </div>
-          </div>
-          <p className="text-sm text-gray-500 dark:text-gray-400">Este mes</p>
-          <p className="text-2xl font-bold text-gray-900 dark:text-white">
-            {stats.diario.entries} entradas
-          </p>
-          <p className="text-xs text-gray-400 mt-1">Última: hace 1 día</p>
-        </Link>
-      </div>
-
-      {/* AI Insight */}
-      {/* <div className="bg-gradient-to-r from-brand-500 to-purple-600 rounded-2xl p-6 text-white">
-        <div className="flex items-start gap-4">
-          <div className="w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center flex-shrink-0">
-            <Sparkles className="w-6 h-6" />
-          </div>
-          <div className="flex-1">
-            <h3 className="font-semibold mb-1">💡 Insight del día</h3>
-            <p className="text-white/90 text-sm">
-              Noté que tus gastos en entretenimiento aumentaron un 25% los fines
-              de semana. ¿Querés que te sugiera alternativas más económicas para
-              divertirte?
+            <p className="text-sm text-gray-500 dark:text-gray-400">Este mes</p>
+            <p className="text-2xl font-bold text-gray-900 dark:text-white">
+              ${(finanzasStats?.totalExpenses ?? 0).toLocaleString("es-AR")}
             </p>
-            <Link
-              href="/dashboard/chat"
-              className="inline-flex items-center gap-1 mt-3 text-sm font-medium hover:underline"
-            >
-              Hablemos más
-              <ArrowRight className="w-4 h-4" />
-            </Link>
-          </div>
+            <p className="text-xs text-gray-400 mt-1">Gastos totales</p>
+          </Link>
+
+          {/* Hábitos */}
+          <Link
+            href="/dashboard/habitos"
+            className="bg-white dark:bg-gray-900 rounded-2xl p-6 border border-gray-200 dark:border-gray-800 hover:shadow-lg transition-shadow group"
+          >
+            <div className="flex items-center justify-between mb-4">
+              <div className="w-12 h-12 rounded-xl bg-habitos/10 flex items-center justify-center">
+                <Target className="w-6 h-6 text-habitos" />
+              </div>
+              {(habitStats?.longestStreak ?? 0) > 0 && (
+                <div className="flex items-center gap-1 text-sm text-orange-500">
+                  <Flame className="w-4 h-4" />
+                  <span>{habitStats!.longestStreak} días</span>
+                </div>
+              )}
+            </div>
+            <p className="text-sm text-gray-500 dark:text-gray-400">Hoy</p>
+            <p className="text-2xl font-bold text-gray-900 dark:text-white">
+              {habitStats?.completedToday ?? 0}/{habitStats?.totalHabits ?? 0}
+            </p>
+            <p className="text-xs text-gray-400 mt-1">Hábitos completados</p>
+          </Link>
+
+          {/* Salud */}
+          <Link
+            href="/dashboard/salud"
+            className="bg-white dark:bg-gray-900 rounded-2xl p-6 border border-gray-200 dark:border-gray-800 hover:shadow-lg transition-shadow group"
+          >
+            <div className="flex items-center justify-between mb-4">
+              <div className="w-12 h-12 rounded-xl bg-salud/10 flex items-center justify-center">
+                <Heart className="w-6 h-6 text-salud" />
+              </div>
+              <span className="text-2xl">{moodEmoji}</span>
+            </div>
+            <p className="text-sm text-gray-500 dark:text-gray-400">Próximo período</p>
+            <p className="text-2xl font-bold text-gray-900 dark:text-white">
+              {cycleStats?.prediction
+                ? `${cycleStats.prediction.daysUntilPeriod} días`
+                : "Sin datos"}
+            </p>
+            <p className="text-xs text-gray-400 mt-1">
+              {cycleStats?.prediction?.currentPhase
+                ? `Fase ${cycleStats.prediction.currentPhase}`
+                : "Registrá tu ciclo"}
+            </p>
+          </Link>
+
+          {/* Diario */}
+          <Link
+            href="/dashboard/diario"
+            className="bg-white dark:bg-gray-900 rounded-2xl p-6 border border-gray-200 dark:border-gray-800 hover:shadow-lg transition-shadow group"
+          >
+            <div className="flex items-center justify-between mb-4">
+              <div className="w-12 h-12 rounded-xl bg-diario/10 flex items-center justify-center">
+                <BookOpen className="w-6 h-6 text-diario" />
+              </div>
+              {(journalStats?.streak ?? 0) > 0 && (
+                <div className="flex items-center gap-1 text-sm text-diario">
+                  <Calendar className="w-4 h-4" />
+                  <span>{journalStats!.streak} días</span>
+                </div>
+              )}
+            </div>
+            <p className="text-sm text-gray-500 dark:text-gray-400">Este mes</p>
+            <p className="text-2xl font-bold text-gray-900 dark:text-white">
+              {journalStats?.entriesThisMonth ?? 0} entradas
+            </p>
+            <p className="text-xs text-gray-400 mt-1">
+              {journalStats?.totalWords
+                ? `${journalStats.totalWords.toLocaleString("es-AR")} palabras`
+                : "Empezá a escribir"}
+            </p>
+          </Link>
         </div>
-      </div> */}
+      )}
+
+      {/* Chat IA */}
+      <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 overflow-hidden">
+        <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-800">
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+            🤖 Tu coach IA
+          </h2>
+          <p className="text-sm text-gray-500 dark:text-gray-400">
+            Preguntame sobre tus finanzas, hábitos, salud o bienestar
+          </p>
+        </div>
+        <ChatAI />
+      </div>
 
       {/* Recent Activity */}
       <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800">
@@ -248,43 +262,54 @@ export default function DashboardPage() {
             Actividad reciente
           </h2>
         </div>
-        <div className="divide-y divide-gray-200 dark:divide-gray-800">
-          {recentActivity.map((activity, index) => (
-            <div
-              key={index}
-              className="px-6 py-4 flex items-center gap-4 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors"
-            >
-              <div
-                className={`w-10 h-10 rounded-xl bg-gray-100 dark:bg-gray-800 flex items-center justify-center`}
+        {isLoading ? (
+          <div className="divide-y divide-gray-200 dark:divide-gray-800">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="px-6 py-4 flex items-center gap-4 animate-pulse">
+                <div className="w-10 h-10 bg-gray-200 dark:bg-gray-700 rounded-xl" />
+                <div className="flex-1 space-y-2">
+                  <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-40" />
+                  <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-24" />
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : recentActivity.length === 0 ? (
+          <div className="p-8 text-center">
+            <p className="text-gray-500 dark:text-gray-400">
+              No hay actividad reciente aún.
+            </p>
+            <p className="text-sm text-gray-400 mt-1">
+              Registrá gastos, completá hábitos o escribí en el diario.
+            </p>
+          </div>
+        ) : (
+          <div className="divide-y divide-gray-200 dark:divide-gray-800">
+            {recentActivity.map((activity, index) => (
+              <Link
+                key={index}
+                href={activity.href}
+                className="px-6 py-4 flex items-center gap-4 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors"
               >
-                <activity.icon className={`w-5 h-5 ${activity.color}`} />
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="font-medium text-gray-900 dark:text-white truncate">
-                  {activity.title}
-                </p>
-                <p className="text-sm text-gray-500 truncate">
-                  {activity.subtitle}
-                </p>
-              </div>
-              <div className="text-right">
-                <p className="font-medium text-gray-900 dark:text-white">
-                  {activity.value}
-                </p>
-                <p className="text-xs text-gray-400">{activity.time}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-        <div className="px-6 py-4 border-t border-gray-200 dark:border-gray-800">
-          <Link
-            href="/dashboard/activity"
-            className="text-sm text-brand-600 hover:text-brand-700 font-medium inline-flex items-center gap-1"
-          >
-            Ver toda la actividad
-            <ArrowRight className="w-4 h-4" />
-          </Link>
-        </div>
+                <div className="w-10 h-10 rounded-xl bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
+                  <activity.icon className={`w-5 h-5 ${activity.color}`} />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="font-medium text-gray-900 dark:text-white truncate">
+                    {activity.title}
+                  </p>
+                  <p className="text-sm text-gray-500">{activity.subtitle}</p>
+                </div>
+                <div className="text-right shrink-0">
+                  <p className="font-medium text-gray-900 dark:text-white">
+                    {activity.value}
+                  </p>
+                  <p className="text-xs text-gray-400">{activity.time}</p>
+                </div>
+              </Link>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
