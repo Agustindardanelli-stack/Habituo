@@ -37,3 +37,4 @@ Thumbs.db
 # Other
 *.swp
 *.swo
+*.tsbuildinfo

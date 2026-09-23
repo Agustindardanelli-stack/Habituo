@@ -7,9 +7,9 @@ const inter = Inter({ subsets: ["latin"] });
 
 
 export const metadata: Metadata = {
-  title: "LifeSync - Tu Asistente Personal Inteligente",
+  title: "Habituo — Finanzas, hábitos y diario en un solo lugar",
   description:
-    "Gestiona tus finanzas, hábitos, salud y más con inteligencia artificial. Todo en un solo lugar.",
+    "Gestioná tus finanzas, hábitos y diario personal con un coach de IA. Todo en un solo lugar.",
   keywords: [
     "finanzas personales",
     "tracker de hábitos",
@@ -19,7 +19,7 @@ export const metadata: Metadata = {
   ],
   authors: [{ name: "Agustín" }],
   openGraph: {
-    title: "LifeSync ",
+    title: "Habituo",
     description: "Tu asistente personal inteligente",
     type: "website",
   },

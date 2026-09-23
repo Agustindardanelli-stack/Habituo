@@ -9,7 +9,7 @@ import {
   getHabitStats,
   type HabitWithLogs,
   type NewHabit,
-} from "@/app/api/habits";
+} from "@/lib/data/habits";
 
 export function useHabits() {
   const [habits, setHabits] = useState<HabitWithLogs[]>([]);

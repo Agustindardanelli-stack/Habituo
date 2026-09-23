@@ -215,7 +215,7 @@ export default function HomePage() {
               className="ls-serif"
               style={{ fontSize: 22, letterSpacing: "-0.02em", color: "#fff" }}
             >
-              LifeSync
+              Habituo
             </span>
             <div style={{ display: "flex", alignItems: "center", gap: 24 }}>
               <Link
@@ -476,7 +476,7 @@ export default function HomePage() {
                     color: "rgba(255,255,255,0.35)",
                   }}
                 >
-                  Por qué LifeSync
+                  Por qué Habituo
                 </span>
               </div>
               <h2
@@ -629,10 +629,10 @@ export default function HomePage() {
             }}
           >
             <span className="ls-serif" style={{ fontSize: 18, color: "#fff" }}>
-              LifeSync
+              Habituo
             </span>
             <p style={{ fontSize: 13, color: "rgba(255,255,255,0.25)" }}>
-              © 2025 LifeSync — Hecho con dedicación desde Argentina.
+              © 2026 Habituo — Hecho con dedicación desde Argentina.
             </p>
           </div>
         </footer>

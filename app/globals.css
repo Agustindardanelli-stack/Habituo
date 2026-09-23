@@ -82,10 +82,6 @@
   @apply bg-gradient-to-br from-habitos-light to-habitos-dark;
 }
 
-.gradient-salud {
-  @apply bg-gradient-to-br from-salud-light to-salud-dark;
-}
-
 .gradient-diario {
   @apply bg-gradient-to-br from-diario-light to-diario-dark;
 }

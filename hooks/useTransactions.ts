@@ -8,7 +8,7 @@ import {
   getTransactionStats,
   type Transaction,
   type NewTransaction,
-} from "@/app/api/transactions";
+} from "@/lib/data/transactions";
 
 export function useTransactions() {
   const [transactions, setTransactions] = useState<Transaction[]>([]);

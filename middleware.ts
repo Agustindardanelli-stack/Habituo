@@ -34,7 +34,8 @@ export async function middleware(request: NextRequest) {
     }
   );
 
-  const { data: { session } } = await supabase.auth.getSession();
+  // getUser() valida el token contra Supabase (getSession() solo lee la cookie)
+  const { data: { user } } = await supabase.auth.getUser();
 
   // Rutas protegidas (requieren login)
   const protectedRoutes = ["/dashboard"];
@@ -49,12 +50,12 @@ export async function middleware(request: NextRequest) {
   );
 
   // Si no hay sesión y quiere entrar a ruta protegida → Login
-  if (!session && isProtectedRoute) {
+  if (!user && isProtectedRoute) {
     return NextResponse.redirect(new URL("/auth/login", request.url));
   }
 
   // Si hay sesión y quiere entrar a login/register → Dashboard
-  if (session && isAuthRoute) {
+  if (user && isAuthRoute) {
     return NextResponse.redirect(new URL("/dashboard", request.url));
   }
 
@@ -63,6 +64,6 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
+    "/((?!_next/static|_next/image|favicon.ico|api/mercadopago/webhook|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
   ],
 };

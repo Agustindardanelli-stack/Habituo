@@ -34,11 +34,6 @@ const config: Config = {
           DEFAULT: "#7c3aed",
           dark: "#6d28d9",
         },
-        salud: {
-          light: "#f472b6",
-          DEFAULT: "#ec4899",
-          dark: "#db2777",
-        },
         diario: {
           light: "#fbbf24",
           DEFAULT: "#f59e0b",

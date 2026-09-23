@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { createClient } from "@/lib/supabase";
 import { useUser } from "./useUser";
 
@@ -15,8 +15,8 @@ export function useProfile() {
   const { user, loading: userLoading } = useUser();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
-
-  const supabase = createClient();
+  // Stable client reference — createBrowserClient creates a new object each call
+  const supabase = useRef(createClient()).current;
 
   useEffect(() => {
     if (!user) {
@@ -24,6 +24,8 @@ export function useProfile() {
       setLoading(false);
       return;
     }
+
+    if (userLoading) return;
 
     const loadProfile = async () => {
       const { data, error } = await supabase
@@ -40,9 +42,7 @@ export function useProfile() {
       setLoading(false);
     };
 
-    if (!userLoading) {
-      loadProfile();
-    }
+    loadProfile();
   }, [user, userLoading, supabase]);
 
   return { profile, loading };

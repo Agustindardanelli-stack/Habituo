@@ -10,7 +10,7 @@ import {
   toggleFavorite,
   type JournalEntry,
   type NewJournalEntry,
-} from "@/app/api/journal";
+} from "@/lib/data/journal";
 
 export function useJournal() {
   const [entries, setEntries] = useState<JournalEntry[]>([]);

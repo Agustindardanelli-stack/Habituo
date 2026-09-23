@@ -14,16 +14,28 @@ import {
   X,
 } from "lucide-react";
 import { useHabits } from "@/hooks/useHabits";
-import { HABIT_ICONS, HABIT_COLORS } from "@/app/api/habits";
+import { useProfile } from "@/hooks/useProfile";
+import { HABIT_ICONS, HABIT_COLORS } from "@/lib/data/habits";
+import { UpgradeModal, FREE_LIMITS } from "@/components/upgrade-modal";
 import { toast } from "sonner";
 
 const weekDays = ["L", "M", "X", "J", "V", "S", "D"];
 
 export default function HabitosPage() {
   const { habits, stats, loading, addHabit, toggleHabit, removeHabit } = useHabits();
+  const { profile } = useProfile();
   const [showAddModal, setShowAddModal] = useState(false);
+  const [showUpgrade, setShowUpgrade] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [menuOpen, setMenuOpen] = useState<string | null>(null);
+
+  const isFree = profile?.plan === "free" || !profile?.plan;
+  const atHabitLimit = isFree && (stats?.totalHabits ?? 0) >= FREE_LIMITS.habits;
+
+  const handleOpenAddModal = () => {
+    if (atHabitLimit) { setShowUpgrade(true); return; }
+    setShowAddModal(true);
+  };
 
   // Form state
   const [formData, setFormData] = useState({
@@ -105,7 +117,7 @@ export default function HabitosPage() {
           </p>
         </div>
         <button
-          onClick={() => setShowAddModal(true)}
+          onClick={handleOpenAddModal}
           className="inline-flex items-center gap-2 px-4 py-2 bg-habitos hover:bg-habitos-dark text-white rounded-xl font-medium transition-colors"
         >
           <Plus className="w-5 h-5" />
@@ -195,7 +207,7 @@ export default function HabitosPage() {
             Empezá a construir tus rutinas diarias
           </p>
           <button
-            onClick={() => setShowAddModal(true)}
+            onClick={handleOpenAddModal}
             className="inline-flex items-center gap-2 px-4 py-2 bg-habitos hover:bg-habitos-dark text-white rounded-xl font-medium transition-colors"
           >
             <Plus className="w-5 h-5" />
@@ -296,7 +308,7 @@ export default function HabitosPage() {
 
           {/* Add habit card */}
           <button
-            onClick={() => setShowAddModal(true)}
+            onClick={handleOpenAddModal}
             className="bg-gray-50 dark:bg-gray-800/50 rounded-2xl p-5 border-2 border-dashed border-gray-200 dark:border-gray-700 hover:border-habitos dark:hover:border-habitos transition-colors flex flex-col items-center justify-center min-h-[250px] group"
           >
             <div className="w-12 h-12 rounded-xl bg-gray-200 dark:bg-gray-700 flex items-center justify-center group-hover:bg-habitos/10 transition-colors">
@@ -442,6 +454,12 @@ export default function HabitosPage() {
           </div>
         </div>
       )}
+
+      <UpgradeModal
+        isOpen={showUpgrade}
+        onClose={() => setShowUpgrade(false)}
+        reason="habits"
+      />
     </div>
   );
 }

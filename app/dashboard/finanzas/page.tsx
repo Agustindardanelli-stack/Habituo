@@ -15,7 +15,9 @@ import {
   X,
 } from "lucide-react";
 import { useTransactions } from "@/hooks/useTransactions";
-import { CATEGORIES, type NewTransaction } from "@/app/api/transactions";
+import { useProfile } from "@/hooks/useProfile";
+import { CATEGORIES, type NewTransaction } from "@/lib/data/transactions";
+import { UpgradeModal, FREE_LIMITS } from "@/components/upgrade-modal";
 import { toast } from "sonner";
 
 const getCategoryColor = (category: string) => {
@@ -50,9 +52,19 @@ const getCategoryBarColor = (category: string) => {
 
 export default function FinanzasPage() {
   const { transactions, stats, loading, addTransaction, removeTransaction } = useTransactions();
+  const { profile } = useProfile();
   const [showAddModal, setShowAddModal] = useState(false);
+  const [showUpgrade, setShowUpgrade] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const isFree = profile?.plan === "free" || !profile?.plan;
+  const atTransactionLimit = isFree && (stats?.transactionCount ?? 0) >= FREE_LIMITS.transactions;
+
+  const handleOpenAddModal = () => {
+    if (atTransactionLimit) { setShowUpgrade(true); return; }
+    setShowAddModal(true);
+  };
   
   // Form state
   const [formData, setFormData] = useState<NewTransaction>({
@@ -129,7 +141,7 @@ export default function FinanzasPage() {
           </p>
         </div>
         <button
-          onClick={() => setShowAddModal(true)}
+          onClick={handleOpenAddModal}
           className="inline-flex items-center gap-2 px-4 py-2 bg-finanzas hover:bg-finanzas-dark text-white rounded-xl font-medium transition-colors"
         >
           <Plus className="w-5 h-5" />
@@ -202,7 +214,7 @@ export default function FinanzasPage() {
                 {searchTerm ? "No se encontraron transacciones" : "No hay gastos registrados"}
               </p>
               <button
-                onClick={() => setShowAddModal(true)}
+                onClick={handleOpenAddModal}
                 className="mt-3 text-finanzas hover:underline font-medium"
               >
                 Agregar tu primer gasto
@@ -405,6 +417,12 @@ export default function FinanzasPage() {
           </div>
         </div>
       )}
+
+      <UpgradeModal
+        isOpen={showUpgrade}
+        onClose={() => setShowUpgrade(false)}
+        reason="transactions"
+      />
     </div>
   );
 }

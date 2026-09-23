@@ -2,6 +2,7 @@
 
 import { usePlan } from "@/hooks/usePlan";
 import { Crown, Zap, X, Check } from "lucide-react";
+import { FREE_LIMITS } from "@/lib/plans";
 
 interface UpgradeModalProps {
   isOpen:  boolean;
@@ -9,18 +10,19 @@ interface UpgradeModalProps {
   reason?: "habits" | "transactions" | "journalEntries";
 }
 
+export { FREE_LIMITS };
+
 const REASON_COPY = {
-  habits:         { title: "Llegaste al límite de hábitos",   description: "El plan Free incluye hasta 3 hábitos activos. Pasate a Premium para crear los que quieras.", icon: "🎯" },
-  transactions:   { title: "Límite de transacciones del mes", description: "El plan Free incluye 20 transacciones por mes. Premium te da registros ilimitados.",         icon: "💰" },
-  journalEntries: { title: "Límite de entradas del mes",      description: "El plan Free incluye 10 entradas de diario por mes. Premium es ilimitado.",                   icon: "📓" },
+  habits:         { title: "Llegaste al límite del plan Free",  description: `El plan Free incluye hasta ${FREE_LIMITS.habits} hábitos activos. Pasate a Premium para crear los que quieras.`,     icon: "🎯" },
+  transactions:   { title: "Llegaste al límite del plan Free",  description: `El plan Free incluye hasta ${FREE_LIMITS.transactions} movimientos por mes. Pasate a Premium para registros ilimitados.`,          icon: "💰" },
+  journalEntries: { title: "Llegaste al límite del plan Free",  description: `El plan Free incluye hasta ${FREE_LIMITS.journalEntries} entradas de diario por mes. Pasate a Premium para escribir sin límite.`, icon: "📓" },
 };
 
 const FEATURES = [
   "Hábitos ilimitados",
   "Transacciones ilimitadas",
   "Entradas de diario ilimitadas",
-  "Exportar datos en CSV",
-  "Soporte prioritario",
+  "Coach IA con más mensajes por día",
 ];
 
 export function UpgradeModal({ isOpen, onClose, reason = "habits" }: UpgradeModalProps) {

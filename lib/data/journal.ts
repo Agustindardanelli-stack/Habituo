@@ -4,8 +4,8 @@ export type JournalEntry = {
   id: string;
   user_id: string;
   title: string;
-  content: string;
-  mood?: "amazing" | "good" | "neutral" | "bad" | "terrible";
+  content?: string; // only loaded on-demand via getJournalEntry(id)
+  mood?: "great" | "good" | "okay" | "bad" | "terrible";
   mood_score?: number;
   energy_level?: number;
   tags: string[];
@@ -19,7 +19,7 @@ export type JournalEntry = {
 export type NewJournalEntry = {
   title?: string;
   content: string;
-  mood?: JournalEntry["mood"];
+  mood?: "great" | "good" | "okay" | "bad" | "terrible";
   energy_level?: number;
   tags?: string[];
   is_favorite?: boolean;
@@ -34,11 +34,11 @@ export type JournalPrompt = {
 
 // Moods disponibles
 export const MOODS = [
-  { value: "amazing", label: "Increíble", icon: "🤩", color: "#10b981", score: 5 },
-  { value: "good", label: "Bien", icon: "😊", color: "#22c55e", score: 4 },
-  { value: "neutral", label: "Normal", icon: "😐", color: "#eab308", score: 3 },
-  { value: "bad", label: "Mal", icon: "😔", color: "#f97316", score: 2 },
-  { value: "terrible", label: "Muy mal", icon: "😢", color: "#ef4444", score: 1 },
+  { value: "great",    label: "Increíble", icon: "🤩", color: "#10b981", score: 5 },
+  { value: "good",     label: "Bien",      icon: "😊", color: "#22c55e", score: 4 },
+  { value: "okay",     label: "Normal",    icon: "😐", color: "#eab308", score: 3 },
+  { value: "bad",      label: "Mal",       icon: "😔", color: "#f97316", score: 2 },
+  { value: "terrible", label: "Muy mal",   icon: "😢", color: "#ef4444", score: 1 },
 ];
 
 // Niveles de energía
@@ -329,7 +329,16 @@ export function calculateWritingStreak(entries: JournalEntry[]): number {
 
 // Obtener estadísticas
 export async function getJournalStats() {
-  const entries = await getJournalEntries({ limit: 365 });
+  // Fetch only metadata (no content field) — content can be thousands of chars per entry
+  const supabase = createClient();
+  const { data, error } = await supabase
+    .from("journal_entries")
+    .select("id, user_id, title, mood, mood_score, energy_level, tags, is_favorite, date, word_count, created_at, updated_at")
+    .order("date", { ascending: false })
+    .limit(365);
+
+  if (error) console.error("Error fetching journal stats:", error);
+  const entries: JournalEntry[] = (data || []) as JournalEntry[];
 
   const totalEntries = entries.length;
   const totalWords = entries.reduce((sum, e) => sum + e.word_count, 0);

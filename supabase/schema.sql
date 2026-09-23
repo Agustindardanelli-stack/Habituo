@@ -1,6 +1,7 @@
 -- ============================================
--- LIFESYNC AI - ESQUEMA DE BASE DE DATOS
--- Para usar en Supabase SQL Editor
+-- HABITUO - ESQUEMA BASE DE LA BASE DE DATOS
+-- 1) Correr este archivo en Supabase → SQL Editor (proyecto nuevo)
+-- 2) Después correr, en orden, los archivos de supabase/migrations/
 -- ============================================
 
 -- Habilitar UUID extension
@@ -142,53 +143,6 @@ CREATE POLICY "Users can CRUD own habit_logs" ON public.habit_logs
     FOR ALL USING (auth.uid() = user_id);
 
 -- ============================================
--- MÓDULO: SALUD / CICLO MENSTRUAL
--- ============================================
-
--- Registros de ciclo
-CREATE TABLE public.cycle_logs (
-    id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
-    user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
-    date DATE NOT NULL,
-    flow_intensity TEXT CHECK (flow_intensity IN ('light', 'medium', 'heavy', 'spotting')),
-    is_period_start BOOLEAN DEFAULT FALSE,
-    symptoms TEXT[], -- Array de síntomas
-    mood TEXT CHECK (mood IN ('great', 'good', 'okay', 'bad', 'terrible')),
-    energy_level INTEGER CHECK (energy_level BETWEEN 1 AND 5),
-    notes TEXT,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
-);
-
--- Predicciones de ciclo
-CREATE TABLE public.cycle_predictions (
-    id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
-    user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
-    predicted_start DATE NOT NULL,
-    predicted_end DATE NOT NULL,
-    cycle_length INTEGER,
-    period_length INTEGER,
-    fertility_window_start DATE,
-    fertility_window_end DATE,
-    ovulation_date DATE,
-    confidence DECIMAL(3, 2),
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
-);
-
--- Índices
-CREATE INDEX idx_cycle_logs_user_date ON public.cycle_logs(user_id, date);
-CREATE INDEX idx_cycle_predictions_user ON public.cycle_predictions(user_id);
-
--- RLS
-ALTER TABLE public.cycle_logs ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.cycle_predictions ENABLE ROW LEVEL SECURITY;
-
-CREATE POLICY "Users can CRUD own cycle_logs" ON public.cycle_logs
-    FOR ALL USING (auth.uid() = user_id);
-
-CREATE POLICY "Users can CRUD own cycle_predictions" ON public.cycle_predictions
-    FOR ALL USING (auth.uid() = user_id);
-
--- ============================================
 -- MÓDULO: DIARIO
 -- ============================================
 
@@ -200,6 +154,7 @@ CREATE TABLE public.journal_entries (
     content TEXT NOT NULL,
     mood TEXT CHECK (mood IN ('great', 'good', 'okay', 'bad', 'terrible')),
     mood_score INTEGER CHECK (mood_score BETWEEN 1 AND 10),
+    energy_level INTEGER CHECK (energy_level BETWEEN 1 AND 5),
     sentiment TEXT CHECK (sentiment IN ('positive', 'neutral', 'negative')),
     sentiment_score DECIMAL(3, 2), -- -1 a 1
     tags TEXT[],

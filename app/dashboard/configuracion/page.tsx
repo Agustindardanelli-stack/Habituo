@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -69,7 +69,8 @@ type Section = "perfil" | "preferencias" | "cuenta";
 
 // ─── Componente principal ────────────────────────────────────────────
 export default function ConfiguracionPage() {
-  const supabase = createClient(); 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const supabase = useMemo(() => createClient(), []);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [section, setSection]             = useState<Section>("perfil");
@@ -118,6 +119,7 @@ export default function ConfiguracionPage() {
       setLoading(false);
     }
     loadProfile();
+  // supabase is stable via useMemo so it's safe in deps
   }, [supabase, reset]);
 
   // ── Guardar perfil ─────────────────────────────────────────────────

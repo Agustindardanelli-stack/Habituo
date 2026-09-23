@@ -58,7 +58,7 @@ export default function LoginPage() {
               <Sparkles className="w-7 h-7 text-white" />
             </div>
             <span className="text-2xl font-bold text-gray-900 dark:text-white">
-              LifeSync 
+              Habituo 
             </span>
           </Link>
         </div>
@@ -215,7 +215,7 @@ export default function LoginPage() {
 
         {/* Footer */}
         <p className="text-center text-gray-400 text-sm mt-6">
-          © 2024 LifeSync 
+          © 2026 Habituo 
         </p>
       </div>
     </div>

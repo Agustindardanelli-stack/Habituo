@@ -11,7 +11,7 @@ type Message = {
 const SUGGESTED_QUESTIONS = [
   "¿Cómo puedo mejorar mis finanzas?",
   "Dame tips para construir hábitos",
-  "¿Qué ejercicio es mejor para mi fase del ciclo?",
+  "¿En qué categoría gasté más este mes?",
   "Ayudame a organizar mi semana",
 ];
 
@@ -83,7 +83,7 @@ export default function ChatAI() {
                 Hola, soy tu coach IA
               </p>
               <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                Puedo ayudarte con finanzas, hábitos, salud y bienestar
+                Puedo ayudarte con finanzas, hábitos y tu diario
               </p>
             </div>
             <div className="grid grid-cols-2 gap-2 w-full max-w-sm">

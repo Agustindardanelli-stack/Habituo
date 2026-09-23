@@ -1,32 +1,39 @@
 import { NextResponse } from "next/server";
-import { createServerClient } from "@supabase/ssr";
-import { createClient } from "@supabase/supabase-js";
-import { cookies } from "next/headers";
+import { PreApproval } from "mercadopago";
+import { mp } from "@/lib/mercadopago";
+import { createAdminSupabase, createServerSupabase } from "@/lib/supabase-server";
 
 export async function DELETE() {
   try {
-    const cookieStore = cookies();
-    const supabase = createServerClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-      {
-        cookies: {
-          get(name: string) { return cookieStore.get(name)?.value; },
-          set(name: string, value: string, options: any) { cookieStore.set(name, value, options); },
-          remove(name: string, options: any) { cookieStore.set(name, "", options); },
-        },
-      }
-    );
-
+    const supabase = createServerSupabase();
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
       return NextResponse.json({ error: "No autenticado" }, { status: 401 });
     }
 
-    const supabaseAdmin = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!
-    );
+    const supabaseAdmin = createAdminSupabase();
+
+    // Si tiene una suscripción activa, cancelarla antes de borrar la cuenta
+    const { data: profile } = await supabaseAdmin
+      .from("profiles")
+      .select("mp_subscription_id")
+      .eq("id", user.id)
+      .single();
+
+    if (profile?.mp_subscription_id) {
+      try {
+        await new PreApproval(mp).update({
+          id: profile.mp_subscription_id,
+          body: { status: "cancelled" },
+        });
+      } catch (err) {
+        console.error("No se pudo cancelar la suscripción en MP:", err);
+        return NextResponse.json(
+          { error: "No se pudo cancelar tu suscripción. Intentá de nuevo." },
+          { status: 502 }
+        );
+      }
+    }
 
     const { error } = await supabaseAdmin.auth.admin.deleteUser(user.id);
     if (error) {

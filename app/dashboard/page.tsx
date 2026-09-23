@@ -4,7 +4,6 @@ import Link from "next/link";
 import {
   Wallet,
   Target,
-  Heart,
   BookOpen,
   TrendingDown,
   Flame,
@@ -13,7 +12,6 @@ import {
 import ChatAI from "@/components/ChatAI";
 import { useTransactions } from "@/hooks/useTransactions";
 import { useHabits } from "@/hooks/useHabits";
-import { useCycle } from "@/hooks/useCycle";
 import { useJournal } from "@/hooks/useJournal";
 import { useProfile } from "@/hooks/useProfile";
 
@@ -54,11 +52,10 @@ function StatSkeleton() {
 export default function DashboardPage() {
   const { stats: finanzasStats, transactions, loading: finanzasLoading } = useTransactions();
   const { stats: habitStats, habits, loading: habitLoading } = useHabits();
-  const { stats: cycleStats, loading: cycleLoading } = useCycle();
   const { stats: journalStats, entries, loading: journalLoading } = useJournal();
   const { profile } = useProfile();
 
-  const isLoading = finanzasLoading || habitLoading || cycleLoading || journalLoading;
+  const isLoading = finanzasLoading || habitLoading || journalLoading;
 
   const firstName = profile?.full_name?.split(" ")[0] || null;
 
@@ -99,14 +96,6 @@ export default function DashboardPage() {
     })),
   ].slice(0, 5);
 
-  const moodEmoji = cycleStats?.avgMoodScore
-    ? cycleStats.avgMoodScore >= 4
-      ? "😊"
-      : cycleStats.avgMoodScore >= 3
-      ? "😐"
-      : "😔"
-    : "💗";
-
   return (
     <div className="space-y-8">
       {/* Header */}
@@ -135,14 +124,13 @@ export default function DashboardPage() {
 
       {/* Stats Grid */}
       {isLoading ? (
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <StatSkeleton />
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
           <StatSkeleton />
           <StatSkeleton />
           <StatSkeleton />
         </div>
       ) : (
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {/* Finanzas */}
           <Link
             href="/dashboard/finanzas"
@@ -189,30 +177,6 @@ export default function DashboardPage() {
             <p className="text-xs text-gray-400 mt-1">Hábitos completados</p>
           </Link>
 
-          {/* Salud */}
-          <Link
-            href="/dashboard/salud"
-            className="bg-white dark:bg-gray-900 rounded-2xl p-6 border border-gray-200 dark:border-gray-800 hover:shadow-lg transition-shadow group"
-          >
-            <div className="flex items-center justify-between mb-4">
-              <div className="w-12 h-12 rounded-xl bg-salud/10 flex items-center justify-center">
-                <Heart className="w-6 h-6 text-salud" />
-              </div>
-              <span className="text-2xl">{moodEmoji}</span>
-            </div>
-            <p className="text-sm text-gray-500 dark:text-gray-400">Próximo período</p>
-            <p className="text-2xl font-bold text-gray-900 dark:text-white">
-              {cycleStats?.prediction
-                ? `${cycleStats.prediction.daysUntilPeriod} días`
-                : "Sin datos"}
-            </p>
-            <p className="text-xs text-gray-400 mt-1">
-              {cycleStats?.prediction?.currentPhase
-                ? `Fase ${cycleStats.prediction.currentPhase}`
-                : "Registrá tu ciclo"}
-            </p>
-          </Link>
-
           {/* Diario */}
           <Link
             href="/dashboard/diario"
@@ -249,7 +213,7 @@ export default function DashboardPage() {
             🤖 Tu coach IA
           </h2>
           <p className="text-sm text-gray-500 dark:text-gray-400">
-            Preguntame sobre tus finanzas, hábitos, salud o bienestar
+            Preguntame sobre tus finanzas, hábitos o tu diario
           </p>
         </div>
         <ChatAI />

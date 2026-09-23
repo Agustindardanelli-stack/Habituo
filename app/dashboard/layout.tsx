@@ -6,7 +6,6 @@ import { usePathname, useRouter } from "next/navigation";
 import {
   Wallet,
   Target,
-  Heart,
   BookOpen,
   LayoutDashboard,
   Settings,
@@ -23,7 +22,7 @@ import { cn } from "@/lib/utils";
 import { useUser } from "@/hooks/useUser";
 import { useProfile } from "@/hooks/useProfile";
 import { createClient } from "@/lib/supabase";
-import { UpgradeModal } from "../../components/upgrade-modal";
+import { UpgradeModal } from "@/components/upgrade-modal";
 
 const navigation = [
   {
@@ -46,13 +45,6 @@ const navigation = [
     icon: Target,
     color: "text-habitos",
     bgColor: "bg-habitos/10",
-  },
-  {
-    name: "Salud",
-    href: "/dashboard/salud",
-    icon: Heart,
-    color: "text-salud",
-    bgColor: "bg-salud/10",
   },
   {
     name: "Diario",
@@ -115,7 +107,7 @@ export default function DashboardLayout({
               <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-500 to-brand-700 flex items-center justify-center">
                 <Sparkles className="w-6 h-6 text-white" />
               </div>
-              <span className="text-xl font-bold">LifeSync</span>
+              <span className="text-xl font-bold">Habituo</span>
             </Link>
             <button onClick={() => setSidebarOpen(false)} className="lg:hidden">
               <X className="w-5 h-5" />

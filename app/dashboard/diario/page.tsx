@@ -29,6 +29,8 @@ import {
   Zap,
 } from "lucide-react";
 import { useJournal } from "@/hooks/useJournal";
+import { useProfile } from "@/hooks/useProfile";
+import { UpgradeModal, FREE_LIMITS } from "@/components/upgrade-modal";
 import {
   MOODS,
   ENERGY_LEVELS,
@@ -37,9 +39,10 @@ import {
   SUGGESTED_TAGS,
   getRandomPrompt,
   analyzeContent,
+  getJournalEntry,
   type NewJournalEntry,
   type JournalEntry,
-} from "@/app/api/journal";
+} from "@/lib/data/journal";
 import { toast } from "sonner";
 
 const WEEKDAYS = ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"];
@@ -55,7 +58,12 @@ export default function DiarioPage() {
     toggleEntryFavorite,
     searchEntries,
   } = useJournal();
+  const { profile } = useProfile();
 
+  const isFree = profile?.plan === "free" || !profile?.plan;
+  const atJournalLimit = isFree && (stats?.entriesThisMonth ?? 0) >= FREE_LIMITS.journalEntries;
+
+  const [showUpgrade, setShowUpgrade] = useState(false);
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [selectedEntry, setSelectedEntry] = useState<JournalEntry | null>(null);
   const [showWriteModal, setShowWriteModal] = useState(false);
@@ -115,6 +123,8 @@ export default function DiarioPage() {
   };
 
   const openWriteModal = (date?: string, prompt?: string) => {
+    // Only block new entries, not edits (editMode check is done separately)
+    if (atJournalLimit) { setShowUpgrade(true); return; }
     setFormData({
       title: "",
       content: prompt ? `${prompt}\n\n` : "",
@@ -129,23 +139,35 @@ export default function DiarioPage() {
     setShowWriteModal(true);
   };
 
-  const openEditModal = (entry: JournalEntry) => {
+  const openEditModal = async (entry: JournalEntry) => {
+    // content is not loaded in list view — fetch it on demand
+    let fullEntry = entry;
+    if (!entry.content) {
+      const fetched = await getJournalEntry(entry.id);
+      if (fetched) fullEntry = fetched;
+    }
     setFormData({
-      title: entry.title,
-      content: entry.content,
-      mood: entry.mood,
-      energy_level: entry.energy_level,
-      tags: entry.tags,
-      date: entry.date,
+      title: fullEntry.title,
+      content: fullEntry.content ?? "",
+      mood: fullEntry.mood,
+      energy_level: fullEntry.energy_level,
+      tags: fullEntry.tags,
+      date: fullEntry.date,
     });
-    setSelectedEntry(entry);
+    setSelectedEntry(fullEntry);
     setEditMode(true);
     setShowEntryModal(false);
     setShowWriteModal(true);
   };
 
-  const openEntryModal = (entry: JournalEntry) => {
-    setSelectedEntry(entry);
+  const openEntryModal = async (entry: JournalEntry) => {
+    // content not included in list fetch — load on demand
+    let fullEntry = entry;
+    if (!entry.content) {
+      const fetched = await getJournalEntry(entry.id);
+      if (fetched) fullEntry = fetched;
+    }
+    setSelectedEntry(fullEntry);
     setShowEntryModal(true);
   };
 
@@ -510,7 +532,7 @@ export default function DiarioPage() {
                           )}
                         </div>
                         <p className="text-sm text-gray-500 dark:text-gray-400 line-clamp-2 mt-1">
-                          {entry.content.substring(0, 150)}...
+                          {entry.content ? `${entry.content.substring(0, 150)}...` : entry.title}
                         </p>
                         <div className="flex items-center gap-3 mt-2 text-xs text-gray-400">
                           <span className="flex items-center gap-1">
@@ -613,7 +635,7 @@ export default function DiarioPage() {
                   Prompt del día
                 </h4>
                 <p className="text-sm text-gray-600 dark:text-gray-400 italic">
-                  "{getRandomPrompt().text}"
+                  &ldquo;{getRandomPrompt().text}&rdquo;
                 </p>
                 <button
                   onClick={() => selectRandomPrompt()}
@@ -952,7 +974,7 @@ export default function DiarioPage() {
             <div className="p-5 max-h-[50vh] overflow-y-auto">
               <div className="prose prose-gray dark:prose-invert max-w-none">
                 <p className="whitespace-pre-wrap text-gray-700 dark:text-gray-300 leading-relaxed">
-                  {selectedEntry.content}
+                  {selectedEntry.content ?? ""}
                 </p>
               </div>
 
@@ -1114,6 +1136,12 @@ export default function DiarioPage() {
           </div>
         </div>
       )}
+
+      <UpgradeModal
+        isOpen={showUpgrade}
+        onClose={() => setShowUpgrade(false)}
+        reason="journalEntries"
+      />
     </div>
   );
 }
